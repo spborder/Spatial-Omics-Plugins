@@ -1,0 +1,20 @@
+{
+    "CellSegmentation": {
+        "type": "python"
+    },
+    "CreateAnnotation": {
+        "type": "python"
+    },
+    "ExportAnnotations": {
+        "type": "python"
+    },
+    "FeatureExtraction": {
+        "type": "python"
+    },
+    "RegisterImages": {
+        "type": "python"
+    },
+    "SpatialAggregation": {
+        "type": "python"
+    }
+}
