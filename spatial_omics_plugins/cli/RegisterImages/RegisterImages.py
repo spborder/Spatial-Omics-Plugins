@@ -8,24 +8,6 @@ import json
 import girder_client
 from ctk_cli import CLIArgumentParser
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 def main(args):
 
     sys.stdout.flush()
