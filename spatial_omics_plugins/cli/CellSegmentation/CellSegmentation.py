@@ -91,20 +91,65 @@ def main(args):
     print('Input arguments: ')
     for a in vars(args):
         print(f'{a}: {getattr(args,a)}')
+
+    file_info = gc.get(f'/file/{args.input_image}')
+    image_id = file_info['itemId']
+    image_name = file_info['name']
+
+
+    if args.input_region==[-1,-1,-1,-1]:
+        patch_region = 'all'
+    else:
+        patch_region = {
+            'type': 'FeatureCollection',
+            'features': [
+                {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Polygon',
+                        'coordinates': [[
+                            [args.input_region[0],args.input_region[1]],
+                            [args.input_region[2],args.input_region[1]],
+                            [args.input_region[2],args.input_region[3]],
+                            [args.input_region[0],args.input_region[1]],
+                            [args.input_region[0],args.input_region[1]]
+                        ]]
+                    },
+                    'properties': {
+                        'name': 'patch region'
+                    }
+                }
+            ],
+            'properties': {
+                'name': 'patch region'
+            }
+        }
+
+
+
+    # Downloading the slide 
+    gc.downloadFile(
+        fileId = args.input_image,
+        path = os.getcwd()+f'/{image_name}'
+    )
     
     cell_seg_dataset = SegmentationDataset(
-        slides = [],
+        slides = [
+            os.getcwd()+f'/{image_name}'
+        ],
         annotations = None,
         use_parallel = False,
         verbose = True,
         patch_mode = 'all',
-        patch_region = 'tissue',
-        patch_size = [224,224]
+        patch_region = patch_region,
+        patch_size = [args.patch_size,args.patch_size]
     )
 
+    # This can be added to the xml some other time
+    model_args = {}
     cell_model = CellModel(
-        model_type = args.model_type,
-        model_args = args.model_args
+        model_type = args.method,
+        model_args = model_args
     )
 
     all_cells_gdf = gpd.GeoDataFrame()
