@@ -18,6 +18,54 @@
       <channel>input</channel>
       <index>0</index>
     </image>
+    <boolean>
+      <name>extract_sub_compartments</name>
+      <longflag>extract-sub-compartments</longflag>
+      <label>Extract Sub Compartments</label>
+      <description>Whether or not to extract sub-compartments prior to feature extraction.</description>
+      <default>0</default>
+    </boolean>
+    <integer>
+      <name></name>
+      <longflag></longflag>
+      <label></label>
+      <description></description>
+    </integer>
+    <integer>
+      <name></name>
+      <longflag></longflag>
+      <label></label>
+      <description></description>
+      <default></default>
+    </integer>
+    <integer>
+      <name>hematoxylin_threshold</name>
+      <longflag>hematoxylin-threshold</longflag>
+      <label>Hematoxylin Threshold</label>
+      <description>Threshold to apply for hematoxylin segmentation (only used if extract_sub_compartments is True)</description>
+      <default>150</default>
+    </integer>
+    <integer>
+      <name>eosinophilic_threshold</name>
+      <longflag>eosinophilic-threshold</longflag>
+      <label>Eosinophilic Threshold</label>
+      <description>Threshold to apply for eosinophilic segmentation (only used if extract_sub_compartments is True)</description>
+      <default>30</default>
+    </integer>
+    <integer>
+      <name>hematoxylin_min_size</name>
+      <longflag>hematoxylin-min-size</longflag>
+      <label>Hematoxylin Minimum Size</label>
+      <description>Minimum size for hematoxylin objects (only used if extract_sub_compartments is True)</description>
+      <default>40</default>
+    </integer>
+    <integer>
+      <name>eosinophilic_min_size</name>
+      <longflag>eosinophilic-min-size</longflag>
+      <label>Eosinophilic Minimum Size</label>
+      <description>Minimum size for eosinophilic objects (only used if extract_sub_compartments is True)</description>
+      <default>20</default>
+    </integer>
   </parameters>
   <parameters advanced="true">
     <label>Girder API URL and Key</label>

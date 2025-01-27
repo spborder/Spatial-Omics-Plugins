@@ -52,7 +52,7 @@ setup(
         'girder-client',
         'ctk-cli',
         'wsi-annotations-kit>=1.4.9',
-        'fusion-tools>=1.0.0'
+        'fusion-tools>=3.0.0'
         'deepcell-toolbox>=0.12.1',
         'deepcell>=0.12.9',
         'numpy>=1.23.0',
