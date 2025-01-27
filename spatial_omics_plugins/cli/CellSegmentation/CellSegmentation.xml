@@ -31,7 +31,6 @@
       <label>Segmentation Method</label>
       <description>What method to use to segment cells. Available options include DeepCell, CellPose, and Otsu's.</description>
       <default>CellPose</default>
-      <element>DeepCell</element>
       <element>CellPose</element>
       <index>4</index>
     </string-enumeration>

@@ -14,7 +14,7 @@ import large_image
 from tqdm import tqdm
 
 import cellpose
-import deepcell
+#import deepcell
 import tensorflow as tf
 
 from pathlib import Path
@@ -37,11 +37,14 @@ class CellModel:
         if self.model_type=='cellpose':
             self.model = cellpose.models.CellposeModel(pretrained_model = '../.cellpose/models/tissuenet_cp3',gpu=True)
         elif self.model_type=='deepcell':
+            raise NotImplementedError
+            """
             self.model = deepcell.applications.NuclearSegmentation(
                 model = tf.keras.models.load_model(
                     Path("../.deepcell/models") / 'NuclearSegmentation'
                 )
             )
+            """
 
     def predict(self, input_image, bbox):
 
@@ -52,7 +55,8 @@ class CellModel:
                                           channels = self.model_args['channels'])
         
         elif self.model_type=='deepcell':
-            masks = self.model.predict(input_image)
+            raise NotImplementedError
+            #masks = self.model.predict(input_image)
 
         mask_shapes = self.mask_to_shape(masks,bbox)
 

@@ -50,7 +50,7 @@ RUN which  python && \
 ENV build_path=$PWD/build
 ENV PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
 
-ENV plugin_path=$PWD/spatial_omics_plugins
+ENV plugin_path=spatial_omics_plugins
 RUN mkdir -p ${plugin_path}
 
 RUN apt-get update && \
@@ -62,8 +62,10 @@ WORKDIR $plugin_path
 
 # Installing packages in setup.py
 # Make sure to add links for large-image whls
-RUN pip install --no-cache-dir --upgrade --ignore-installed pip setuptools && \
-    pip install --no-cache-dir . --find-links https://girder.github.io/large_image_wheels && \
+RUN pip install --upgrade pip
+
+RUN pip install --upgrade --ignore-installed pip setuptools && \
+    pip install . --find-links https://girder.github.io/large_image_wheels && \
     rm -rf /root/.cache/pip/*
 
 
