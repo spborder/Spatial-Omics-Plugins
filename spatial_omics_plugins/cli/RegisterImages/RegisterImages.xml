@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <executable>
-  <category>HistomicsTK</category>
+  <category>FUSION Plugins</category>
   <title>Register Images</title>
   <description>Register two image items and save the resulting merged image as a separate item.</description>
   <version>0.1.0</version>

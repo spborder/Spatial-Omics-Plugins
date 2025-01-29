@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <executable>
-  <category>HistomicsTK</category>
+  <category>FUSION Plugins</category>
   <title>Spatial Aggregation</title>
   <description>Spatially aggregate properties from one annotation to intersecting structures</description>
   <version>0.1.0</version>

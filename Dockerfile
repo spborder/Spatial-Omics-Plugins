@@ -80,7 +80,7 @@ LABEL entry_path=$plugin_path/cli
 RUN python -m slicer_cli_web.cli_list_entrypoint --list_cli
 RUN python -m slicer_cli_web.cli_list_entrypoint CellSegmentation --help
 RUN python -m slicer_cli_web.cli_list_entrypoint CreateAnnotation --help
-RUN python -m slicer_cli_web.cli_list_entrypoint ExportAnnotation --help
+RUN python -m slicer_cli_web.cli_list_entrypoint ExportAnnotations --help
 RUN python -m slicer_cli_web.cli_list_entrypoint FeatureExtraction --help
 RUN python -m slicer_cli_web.cli_list_entrypoint RegisterImages --help
 RUN python -m slicer_cli_web.cli_list_entrypoint SpatialAggregation --help

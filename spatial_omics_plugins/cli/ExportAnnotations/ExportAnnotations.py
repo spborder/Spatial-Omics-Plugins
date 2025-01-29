@@ -10,7 +10,7 @@ import girder_client
 from ctk_cli import CLIArgumentParser
 
 from fusion_tools.utils.shapes import export_annotations
-from fusion_tools.handler import DSAHandler
+from fusion_tools.handler.dsa_handler import DSAHandler
 
 def main(args):
 

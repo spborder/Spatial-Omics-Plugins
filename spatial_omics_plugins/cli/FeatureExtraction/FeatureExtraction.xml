@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <executable>
-  <category>HistomicsTK</category>
+  <category>FUSION Plugins</category>
   <title>Pathomic Feature Extraction</title>
   <description>Calculate descriptive morphometrics for pathological structures</description>
   <version>0.1.0</version>
@@ -25,19 +25,6 @@
       <description>Whether or not to extract sub-compartments prior to feature extraction.</description>
       <default>0</default>
     </boolean>
-    <integer>
-      <name></name>
-      <longflag></longflag>
-      <label></label>
-      <description></description>
-    </integer>
-    <integer>
-      <name></name>
-      <longflag></longflag>
-      <label></label>
-      <description></description>
-      <default></default>
-    </integer>
     <integer>
       <name>hematoxylin_threshold</name>
       <longflag>hematoxylin-threshold</longflag>
@@ -72,7 +59,7 @@
     <description>A Girder API URL and token for Girder client</description>
     <boolean>
       <name>save_to_files</name>
-      <longflag>save-to-files</name>
+      <longflag>save-to-files</longflag>
       <label>Save to Item Files?</label>
       <description>Check this box to save the extracted features to the "Files" section for this slide</description>
       <default>1</default>

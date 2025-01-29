@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <executable>
-  <category>HistomicsTK</category>
+  <category>FUSION Plugins</category>
   <title>Export Annotations</title>
   <description>Export annoations for an item to alternative formats</description>
   <version>0.1.0</version>

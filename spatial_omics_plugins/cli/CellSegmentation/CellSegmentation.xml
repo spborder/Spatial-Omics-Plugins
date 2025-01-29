@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <executable>
-  <category>HistomicsTK</category>
+  <category>FUSION Plugins</category>
   <title>Cell Segmentation</title>
   <description>Segment nuclei using Deep Learning</description>
   <version>0.1.0</version>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <executable>
-  <category>HistomicsTK</category>
+  <category>FUSION Plugins</category>
   <title>Create Annotation</title>
   <description>Create or edit existing annotations based on selections of which structure should contain what.</description>
   <version>0.1.0</version>

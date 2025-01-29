@@ -15,7 +15,7 @@ from tqdm import tqdm
 
 import cellpose
 #import deepcell
-import tensorflow as tf
+#import tensorflow as tf
 
 from pathlib import Path
 
@@ -187,8 +187,6 @@ def main(args):
         new_annotations = json.load(f)
 
         f.close()
-
-
 
     gc.post(
         f'/annotation/item/{image_id}?token={args.girderToken}',
