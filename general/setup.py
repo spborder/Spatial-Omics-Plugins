@@ -57,7 +57,6 @@ setup(
         'numpy>=1.23.0',
         'tqdm',
         'rasterio',
-        'cellpose'
     ],
     license='Apache Software License 2.0',
     keywords='general',

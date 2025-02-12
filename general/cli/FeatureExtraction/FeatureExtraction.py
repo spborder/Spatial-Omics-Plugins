@@ -205,10 +205,11 @@ def main(args):
     for ann_idx,ann in enumerate(annotations):
         print(f'On annotation: {ann_idx+1}/{len(annotations)}')
         feature_df = feature_extractor.start(ann['features'])
-        feature_df = pd.json_normalize(feature_df.to_dict('records'))
+        feature_df = pd.json_normalize(feature_df.to_dict('records')).dropna(how='all').fillna(0)
         histomics_ann = {
             'annotation': {
                 'name': ann['properties']['name'],
+                '_id': ann['properties']['_id'],
                 'elements': []
             }
         }
@@ -228,12 +229,10 @@ def main(args):
                 for f in ann['features']:
                     ann_bbox = list(shape(f['geometry']).bounds)
                     feature_df_idx = bbox_coords.index(ann_bbox)
-
                     f['properties'] = f['properties'] | feature_df.iloc[feature_df_idx,:].to_dict()
-
                     histomics_el = {
                         'type': 'polyline',
-                        'points': [i+[0] for i in f['geometry']['coordinates'][0]],
+                        'points': [i+[0] if len(i)==2 else i for i in f['geometry']['coordinates'][0]],
                         'user': f['properties']
                     }
 
@@ -242,19 +241,41 @@ def main(args):
         histomics_anns.append(histomics_ann)
             
     if args.save_to_elements:
-        # Just posting a copy for now
-        gc.post(
-            f'/annotation/item/{image_id}?token={args.girderToken}',
-            data = json.dumps(histomics_anns),
-            headers = {
-                'X-HTTP-Method': 'POST',
-                'Content-Type': 'application/json'
+        for h in histomics_anns:
+            print(json.dumps(h,indent=4))
+            put_dict = {
+                "name": h['annotation']['name'],
+                "elements": h['annotation']['elements']
             }
-        )
+            gc.put(
+                f'/annotation/{h["annotation"]["_id"]}?token={args.girderToken}',
+                data = json.dumps(put_dict)
+            )
 
+
+def test():
+    
+    test_args = {
+        'input_image': '6717e743f433060d2884838c',
+        'girderApiUrl': 'http://ec2-3-230-122-132.compute-1.amazonaws.com:8080/api/v1/',
+        'girderToken': 'MG87Dcak28A218XA4HxBLOd1KRaF3s8Vq6YHf79sbQqnaL0hBwPP3aYRsTObQ6tZ',
+        'eosinophilic_min_size': 20,
+        'eosinophilic_threshold': 30,
+        'extract_sub_compartments': True,
+        'hematoxylin_min_size': 40,
+        'hematoxylin_threshold': 150,
+        'save_to_elements': True,
+        'save_to_files': True
+    }
+    class ArgsObj:
+        def __init__(self, args_dict):
+            for a in args_dict:
+                setattr(self,a,args_dict[a])
+
+    main(ArgsObj(test_args))
 
 
 
 if __name__=='__main__':
     main(CLIArgumentParser().parse_args())
-
+    #test()
