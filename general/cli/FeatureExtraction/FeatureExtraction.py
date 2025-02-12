@@ -242,7 +242,6 @@ def main(args):
             
     if args.save_to_elements:
         for h in histomics_anns:
-            print(json.dumps(h,indent=4))
             put_dict = {
                 "name": h['annotation']['name'],
                 "elements": h['annotation']['elements']
