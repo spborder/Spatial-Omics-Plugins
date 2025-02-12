@@ -31,36 +31,29 @@ def prerelease_local_scheme(version):
 
 
 setup(
-    name='Spatial_Omics_Plugins',
+    name='xenium',
     use_scm_version={'local_scheme': prerelease_local_scheme},
-    description='Plugins for integrated analysis of spatial --omics data',
+    description='Plugin for processing 10x Xenium cell annotations',
     long_description=readme,
     long_description_content_type='text/x-rst',
     author='Sam Border',
     author_email='samuel.border@medicine.ufl.edu',
-    url='https://github.com/spborder/Spatial-Omics-Plugins/',
+    url='https://github.com/SarderLab/Spatial-Omics-Plugins/xenium',
     packages=find_packages(exclude=['tests', '*_test']),
     package_dir={
-        'Spatial_Omics_Plugins': 'Spatial_Omics_Plugins',
+        'xenium': 'xenium',
     },
     include_package_data=True,
     install_requires=[
-        'Pillow',
-        'scikit-image>=0.19.3',
-        'scikit-learn>=0.20.4',
+        # scientific packages
         'girder-slicer-cli-web',
         'girder-client',
+        'fusion-tools>=3.0.6',
         'ctk-cli',
-        'wsi-annotations-kit>=1.4.9',
-        'fusion-tools[interactive]>=3.0.4',
-        #'deepcell>=0.12.9',
-        'numpy>=1.23.0',
-        'tqdm',
-        'rasterio',
-        'cellpose'
+        'rpy2',
     ],
     license='Apache Software License 2.0',
-    keywords='Spatial_Omics_Plugins',
+    keywords='xenium',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'License :: OSI Approved :: Apache Software License',

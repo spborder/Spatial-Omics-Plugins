@@ -4,6 +4,7 @@ import os
 import sys
 import numpy as np
 import json
+import pandas as pd
 
 import girder_client
 from ctk_cli import CLIArgumentParser
@@ -116,9 +117,6 @@ def stain_mask(image,mask, seg_params=None):
 
 
 
-
-
-
 def main(args):
 
     sys.stdout.flush()
@@ -195,7 +193,7 @@ def main(args):
                 'texture'
             ],
             preprocess = None,
-            sub_mask = lambda image,mask: stain_mask(image,mask,sub_comp_params = sub_comp_params),
+            sub_mask = lambda image,mask: stain_mask(image,mask,seg_params = sub_comp_params),
             mask_names = mask_names,
             channel_names = channel_names,
             n_jobs = 4,
@@ -207,7 +205,7 @@ def main(args):
     for ann_idx,ann in enumerate(annotations):
         print(f'On annotation: {ann_idx+1}/{len(annotations)}')
         feature_df = feature_extractor.start(ann['features'])
-
+        feature_df = pd.json_normalize(feature_df.to_dict('records'))
         histomics_ann = {
             'annotation': {
                 'name': ann['properties']['name'],
@@ -217,27 +215,29 @@ def main(args):
 
         # Feature_df will have bounding box columns (min_x, min_y, max_x, max_y) which can be used to align with structures
         if args.save_to_files:
-            save_path = os.getcwd()+f'\{ann["properties"]["name"]}.csv'
+            save_path = os.getcwd()+f'/{ann["properties"]["name"].replace("/","_").replace(".","_")}.csv'
             feature_df.to_csv(save_path)
             gc.uploadFileToItem(image_id, save_path, reference=None, mimeType=None, filename=None, progressCallback=None)
         
         if args.save_to_elements:
-            # They should just match by index but this will double check to ensure that bounding boxes align between Features (in the geojson) and feature rows in the dataframe
-            bbox_coords = feature_df[['min_x','min_y','max_x','max_y']].values.tolist()
 
-            for f in ann['features']:
-                ann_bbox = list(shape(f['geometry']).bounds)
-                feature_df_idx = bbox_coords.index(ann_bbox)
+            if not feature_df.empty:
+                # They should just match by index but this will double check to ensure that bounding boxes align between Features (in the geojson) and feature rows in the dataframe
+                bbox_coords = feature_df[['bbox.min_x','bbox.min_y','bbox.max_x','bbox.max_y']].values.tolist()
 
-                f['properties'] = f['properties'] | feature_df.iloc[feature_df_idx,:].to_dict()
+                for f in ann['features']:
+                    ann_bbox = list(shape(f['geometry']).bounds)
+                    feature_df_idx = bbox_coords.index(ann_bbox)
 
-                histomics_el = {
-                    'type': 'polyline',
-                    'points': [i+[0] for i in f['geometry']['coordinates'][0]],
-                    'user': f['properties']
-                }
+                    f['properties'] = f['properties'] | feature_df.iloc[feature_df_idx,:].to_dict()
 
-                histomics_ann['annotation']['elements'].append(histomics_el)
+                    histomics_el = {
+                        'type': 'polyline',
+                        'points': [i+[0] for i in f['geometry']['coordinates'][0]],
+                        'user': f['properties']
+                    }
+
+                    histomics_ann['annotation']['elements'].append(histomics_el)
 
         histomics_anns.append(histomics_ann)
             
