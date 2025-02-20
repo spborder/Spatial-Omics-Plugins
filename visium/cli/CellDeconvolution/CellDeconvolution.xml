@@ -11,7 +11,7 @@
   <parameters>
     <label>IO</label>
     <description>Input/output parameters.</description>
-    <file>
+    <file reference="_girder_id_">
       <name>counts_file</name>
       <label>Counts file</label>
       <description>Counts file can either be RDS, H5AD, or "filtered_feature_bc_matrix.h5" output of *spaceranger* pipeline.</description>

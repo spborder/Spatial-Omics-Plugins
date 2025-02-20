@@ -50,7 +50,7 @@ RUN which  python && \
 ENV build_path=$PWD/build
 ENV PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
 
-ENV plugin_path=codex
+ENV plugin_path=.
 RUN mkdir -p ${plugin_path}
 
 RUN apt-get update && \

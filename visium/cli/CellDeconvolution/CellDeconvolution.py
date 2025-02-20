@@ -55,6 +55,7 @@ robjects.r('library(SeuratData)')
 robjects.r('library(patchwork)')
 robjects.r('library(dplyr)')
 robjects.r('library(tools)')
+robjects.r('options(timeout=300)')
 
 robjects.r('''
             # Function for reading in different types of files
@@ -89,7 +90,7 @@ robjects.r('''
                     integrated_spatial_data <- RunAzimuth(read_input_file,organ_key)
                 }
 
-                output_path <- str_replace(input_file,file_extension,'_integrated.rds')
+                output_path <- str_replace(input_file,paste(".",file_extension,sep=""),'_integrated.rds')
                 saveRDS(integrated_spatial_data, output_path)
            }
            ''')
@@ -164,17 +165,8 @@ robjects.r('''
             }
            ''')
 
-robjects.r('''
-            # Test function
-           test_func <- function(test_str){
-                test_val <- "blahblahblah" %in% test_str
-           
-                return(test_val)
-           }
-            ''')
 
-
-def main(*args):
+def main(args):
 
     gc = girder_client.GirderClient(
         apiUrl = args.girderApiUrl
@@ -189,16 +181,15 @@ def main(*args):
         # print contents of current working directory, see if files were copied over
         print('Contents of working directory')
         print(os.listdir(os.getcwd()+'/'))
+        file_info = gc.get(f'/file/{args.counts_file}')
 
         # Downloading counts file to cwd
         gc.downloadFile(
             args.counts_file,
-            path = './'
+            path = f'{os.getcwd()}/{file_info["name"]}'
         )
         print('Updated contents of directory')
         print(os.listdir(os.getcwd()+'/'))
-
-        file_info = gc.get(f'/file/{args.count_file}')
 
         print(f'Running cell deconvolution for: {args.organ}')
         integrator = robjects.globalenv['integrate_spatial']
@@ -211,12 +202,12 @@ def main(*args):
 
         print(f'Uploading file to {file_info["itemId"]}')
         # Posting integration results to item
+        file_ext = file_info['name'].split('.')[-1]
         uploaded_file = gc.uploadFileToItem(
             itemId = file_info['itemId'],
-            filepath = f'./{file_info["name"].replace(file_info["ext"],"_integrated.rds")}'
+            filepath = f'./{file_info["name"].replace("."+file_ext,"_integrated.rds")}'
         )
         
-
 if __name__=='__main__':
     main(CLIArgumentParser().parse_args())
 

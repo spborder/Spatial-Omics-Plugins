@@ -52,12 +52,14 @@ setup(
         'girder-client',
         'ctk-cli',
         'wsi-annotations-kit>=1.4.9',
-        'fusion-tools[interactive]>=3.1.3',
+        'fusion-tools[interactive]>=3.2.0',
         #'deepcell>=0.12.9',
         'numpy>=1.23.0',
         'tqdm',
         'rasterio',
-        'cellpose'
+        'cellpose>=3.1.1',
+        'pystackreg',
+        'large-image-converter'
     ],
     license='Apache Software License 2.0',
     keywords='codex',

@@ -45,6 +45,20 @@
       <description>Size of patches to extract across selected region</description>
       <default>224</default>
     </integer>
+    <boolean>
+      <name>use_frame_index</name>
+      <longflag>use-frame-index</longflag>
+      <label>Use Frame Index</label>
+      <description>Whether or not to use the segmentation frame input argument</description>
+      <default>1</default>
+    </boolean>
+    <integer>
+      <name>segmentation_frame</name>
+      <longflag>segmentation-frame</longflag>
+      <label>Frame Index for Segmentation</label>
+      <description>If a specific frame should be used for segmentation, add that here.</description>
+      <default>0</default>
+    </integer>
     <string>
       <name>girderApiUrl</name>
       <longflag>api-url</longflag>

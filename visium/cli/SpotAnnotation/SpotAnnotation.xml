@@ -11,7 +11,7 @@
   <parameters>
     <label>IO</label>
     <description>Input/output parameters.</description>
-    <file>
+    <file reference='_girder_id_'>
       <name>counts_file</name>
       <label>Counts file</label>
       <description>Counts file. rds or h5ad types supported. String is item id.</description>
@@ -43,6 +43,13 @@
       <description>A Girder token</description>
       <default></default>
     </string>
+    <boolean>
+      <name>use_gene_selection</name>
+      <longflag>use-gene-selection</longflag>
+      <label>Use Gene Selection</label>
+      <description>Whether or not to select genes based on the below Gene Selection Method. If a specific list is needed, include the file id of a CSV file containing a list of those genes.</description>
+      <default>0</default>
+    </boolean>
     <string-enumeration>
       <name>gene_selection_method</name>
       <longflag>gene_selection_method</longflag>
@@ -50,10 +57,9 @@
       <description>If processing with genes, pass the method of gene selection here.</description>
       <element>highest_mean</element>
       <element>highly_variable</element>
-      <element>specific_list</element>
       <default>highest_mean</default>
     </string-enumeration>
-    <file>
+    <file reference="_girder_id_">
       <name>gene_list_file</name>
       <label>Gene List File</label>
       <longflag>gene_list_file</longflag>
@@ -64,7 +70,7 @@
       <name>n</name>
       <longflag>n</longflag>
       <label>Number of genes</label>
-      <description>If processing with genes, pass the number of genes to include here. This parameter is ignored if a specific list of genes is passed. Set to 0 to ignore genes.</description>
+      <description>If using one of the Gene Selection Methods above, pass the number of genes to include here. This parameter is ignored if a specific list of genes is passed. Set to 0 to ignore genes.</description>
       <default>25</default>
     </integer>
   </parameters>
