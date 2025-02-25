@@ -18,7 +18,7 @@ import uuid
 import subprocess
 from typing_extensions import Union
 
-from fusion_tools.utils.shapes import load_visium, geojson_to_histomics
+#from fusion_tools.utils.shapes import load_visium, geojson_to_histomics
 
 # Make sure these don't have spaces
 INTEGRATION_DATA_KEYS = [
@@ -155,7 +155,34 @@ def load_visium(visium_path:str, include_var_names:list = [], include_obs: list 
 
     return spot_annotations
 
+def geojson_to_histomics(geojson_anns: Union[list,dict]):
 
+    if type(geojson_anns)==dict:
+        geojson_anns = [geojson_anns]
+    
+    histomics_anns = []
+    for g in geojson_anns:
+        if 'properties' in g:
+            g_name = g['properties']['name']
+        else:
+            g_name = ''
+
+        histomics_ann = {
+            'annotation': {
+                'name': g_name,
+                'elements': [
+                    {
+                        'type': 'polyline',
+                        'user': f['properties'],
+                        'points': [list(i)+[0] if type(i)==tuple else i+[0] for i in f['geometry']['coordinates'][0]]
+                    }
+                    for f in g['features']
+                ]
+            }
+        }
+        histomics_anns.append(histomics_ann)
+    
+    return histomics_anns
 
 
 def main(args):
@@ -205,8 +232,27 @@ def main(args):
 
         # Checking for gene_list_file or gene_selection_method
         if args.use_gene_selection:
-            print('Using gene selection')
+            print(f'Using gene selection method: {args.gene_selection_method}, {args.n} selected')
+            subprocess.call(['Rscript', '../../gene_selection_csv.r', file_name_path,args.gene_selection_method,str(args.n)])
+            output_csvs = [i for i in os.listdir(os.getcwd()+'/') if 'csv' in i and not i=='spot_coordinates.csv']
+            print(f'Updated Output CSV files: {output_csvs}')
 
+        if not args.gene_list_file is None:
+            try:
+                gene_list_file_info = gc.get(f'/file/{args.gene_list_file}')
+                print(f'Grabbing specific list of genes from: {gene_list_file_info["name"]}')
+
+                # Downloading counts file to cwd
+                gc.downloadFile(
+                    args.gene_list_file,
+                    path = f'{os.getcwd()}/{gene_list_file_info["name"]}'
+                )
+
+                subprocess.call(['Rscript', '../../gene_selection_csv.r', file_name_path,"specific_list",f'{os.getcwd()}/{gene_list_file_info["name"]}'])
+                output_csvs = [i for i in os.listdir(os.getcwd()+'/') if 'csv' in i and not i=='spot_coordinates.csv']
+                print(f'Updated Output CSV files: {output_csvs}')
+            except girder_client.HttpError:
+                print('No gene_list_file provided')
 
         # Adding properties from other output csv files
         for o in output_csvs:

@@ -724,6 +724,10 @@ class CellModel:
 
         masks = None
         if self.model_type=='cellpose':
+            print(type(input_image))
+            print(np.shape(input_image))
+            print(np.unique(input_image))
+            print(input_image.dtype)
             masks, _, _ = self.model.eval(input_image,
                                           diameter = self.model_args['diameter'],
                                           #cellprob_threshold = self.model_args['cellprob_threshold'],
@@ -734,8 +738,12 @@ class CellModel:
             #masks = self.model.predict(input_image)
         
         if not masks is None:
+            print(type(masks))
+            print(np.shape(masks))
+            print(np.unique(masks))
             mask_shapes = self.mask_to_shape(masks,bbox)
         else:
+            print('Masks is None')
             mask_shapes = []
 
         return mask_shapes
@@ -779,7 +787,7 @@ def main(args):
     image_id = file_info['itemId']
     image_name = file_info['name']
 
-
+    region_annotation = None
     if args.input_region==[-1,-1,-1,-1]:
         patch_region = 'all'
     else:
@@ -794,22 +802,27 @@ def main(args):
                             [args.input_region[0],args.input_region[1]],
                             [args.input_region[2],args.input_region[1]],
                             [args.input_region[2],args.input_region[3]],
-                            [args.input_region[0],args.input_region[1]],
+                            [args.input_region[0],args.input_region[3]],
                             [args.input_region[0],args.input_region[1]]
                         ]]
                     },
                     'properties': {
-                        'name': 'patch region'
+                        'name': 'Segmentation Region'
                     }
                 }
             ],
             'properties': {
-                'name': 'patch region'
+                'name': 'Segmentation Region'
             }
         }
 
+        if args.return_segmentation_region:
+            region_annotation = geojson_to_histomics(patch_region)
+
+
+
     if args.use_frame_index:
-        seg_transform = lambda img: img[:,:,args.segmentation_frame]
+        seg_transform = lambda img: img[:,:,args.segmentation_frame][:,:,None]
     else:
         seg_transform = None
 
@@ -845,13 +858,15 @@ def main(args):
 
     all_cells_gdf = gpd.GeoDataFrame()
 
+    cell_count = 0
     with tqdm(cell_seg_dataset, total = len(cell_seg_dataset)) as pbar:
-        pbar.set_description('Predicting on patches in SegmentationDataset')
+        #pbar.set_description('Predicting on patches in SegmentationDataset')
         for idx, (patch,_) in enumerate(cell_seg_dataset):
             
             bbox = cell_seg_dataset.data[idx]['bbox']
+            print(bbox)
             mask_features = cell_model.predict(patch,bbox)
-
+            cell_count=len(mask_features)
             if len(mask_features)>0:
                 # Converting masks to annotations
                 if all_cells_gdf.empty:
@@ -863,6 +878,7 @@ def main(args):
                     merged_geoms = all_cells_gdf.union_all().geoms
                     all_cells_gdf = gpd.GeoDataFrame({'geometry': merged_geoms, 'name': ["Segmented Cells"]*len(merged_geoms)})
 
+            pbar.set_description(f'Predicting on patches in SegmentationDataset: {cell_count} in last mask, {all_cells_gdf.shape[0]} post-merge')
             pbar.update(1)
 
     pbar.close()   
@@ -884,6 +900,15 @@ def main(args):
         }
     )
 
+    if args.return_segmentation_region and not region_annotation is None:
+        gc.post(
+            f'/annotation/item/{image_id}?token={args.girderToken}',
+            data = json.dumps(region_annotation),
+            headers = {
+                'X-HTTP-Method': 'POST',
+                'Content-Type': 'application/json'
+            }
+        )
 
 
 

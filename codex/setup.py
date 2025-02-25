@@ -59,7 +59,8 @@ setup(
         'rasterio',
         'cellpose>=3.1.1',
         'pystackreg',
-        'large-image-converter'
+        'large-image-converter',
+        'histomicstk'
     ],
     license='Apache Software License 2.0',
     keywords='codex',

@@ -5,6 +5,8 @@ import sys
 import numpy as np
 import json
 import pandas as pd
+import requests
+import time
 
 import girder_client
 from ctk_cli import CLIArgumentParser
@@ -140,10 +142,20 @@ def main(args):
     tile_server = dsa_handler.get_tile_server(
         item = image_id
     )
-    annotations = dsa_handler.get_annotations(
-        item = image_id,
-        user_token = args.girderToken
-    )
+
+    annotations = []
+    for attempt in range(10):
+        print(f'On attempt: {attempt}/10')
+        try:
+            annotations = dsa_handler.get_annotations(
+                item = image_id,
+                user_token = args.girderToken
+            )
+            break
+        except Exception as e:
+            # This will either be a requests.exceptions.ChunkedEncodingError or urllib3.exceptions.ProtocolError or both 
+            # but not sure if this will also trigger a girder_client.HttpError
+            time.sleep(1)
 
     if not args.extract_sub_compartments:
 

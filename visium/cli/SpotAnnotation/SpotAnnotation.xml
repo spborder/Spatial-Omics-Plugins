@@ -55,9 +55,10 @@
       <longflag>gene_selection_method</longflag>
       <label>Gene Selection Method</label>
       <description>If processing with genes, pass the method of gene selection here.</description>
-      <element>highest_mean</element>
-      <element>highly_variable</element>
-      <default>highest_mean</default>
+      <element>vst</element>
+      <element>mean.var.plot</element>
+      <element>dispersion</element>
+      <default>vst</default>
     </string-enumeration>
     <file reference="_girder_id_">
       <name>gene_list_file</name>
