@@ -25,4 +25,14 @@ for (k in key_list){
 # Writing spot coordinates
 spot_save_path <- paste(input_file_path,"spot_coordinates.csv",sep='/')
 print(paste("spot_save_path: ",spot_save_path,sep=''))
-write.csv(read_input_file@images[["slice1"]]@coordinates,spot_save_path)
+
+if ("coordinates" in names(read_input_file@images$slice1)){
+    # This is VisiumV1 format
+    write.csv(read_input_file@images[["slice1"]]@coordinates,spot_save_path)
+} else if ("centroids" in names(read_input_file@images$slice1)){
+    # This is VisiumV2 format
+    centroids <- as.data.frame(read_input_file@images$slice1$centroids@coords)
+    rownames(centroids) <- read_input_file@images$slice1$centroids@cells
+
+    write.csv(centroids,spot_save_path)
+}

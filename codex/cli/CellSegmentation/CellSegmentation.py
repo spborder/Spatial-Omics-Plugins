@@ -728,7 +728,8 @@ class CellModel:
             print(np.shape(input_image))
             print(np.unique(input_image))
             print(input_image.dtype)
-            masks, _, _ = self.model.eval(input_image,
+            input_image = input_image.astype(np.uint8)
+            masks,flows,styles = self.model.eval(input_image,
                                           diameter = self.model_args['diameter'],
                                           #cellprob_threshold = self.model_args['cellprob_threshold'],
                                           channels = self.model_args['channels'])
@@ -859,12 +860,22 @@ def main(args):
     all_cells_gdf = gpd.GeoDataFrame()
 
     cell_count = 0
+    bbox_list = []
     with tqdm(cell_seg_dataset, total = len(cell_seg_dataset)) as pbar:
         #pbar.set_description('Predicting on patches in SegmentationDataset')
         for idx, (patch,_) in enumerate(cell_seg_dataset):
             
             bbox = cell_seg_dataset.data[idx]['bbox']
-            print(bbox)
+            bbox_list.append({
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'Polygon',
+                    'coordinates': list(box(*bbox).exterior.coords),
+                    'properties': {
+                        'name': f'BBox {idx}'
+                    }
+                }
+            })
             mask_features = cell_model.predict(patch,bbox)
             cell_count=len(mask_features)
             if len(mask_features)>0:
@@ -901,6 +912,25 @@ def main(args):
     )
 
     if args.return_segmentation_region and not region_annotation is None:
+        bboxes = geojson_to_histomics(
+            {
+                'type': 'FeatureCollection',
+                'properties': {
+                    'name': 'Segmentation Patches'
+                },
+                'features': bbox_list
+            }
+        )
+
+        gc.post(
+            f'/annotation/item/{image_id}?token={args.girderToken}',
+            data = json.dumps(bboxes),
+            headers = {
+                'X-HTTP-Method': 'POST',
+                'Content-Type': 'application/json'
+            }
+        )
+
         gc.post(
             f'/annotation/item/{image_id}?token={args.girderToken}',
             data = json.dumps(region_annotation),
