@@ -22,7 +22,8 @@ ORGAN_REF_KEY = {
     "Azimuth Pancreas Reference": "pancreasref",
     "Azimuth Mouse Cortex Reference": "mousecortexref",
     "Azimuth PBMC Reference": "pbmcref",
-    "Azimuth Tonsil Reference": "tonsilref"
+    "Azimuth Tonsil Reference": "tonsilref",
+    "ST Deconvolve": "st_deconvolve"
 }
 
 
@@ -48,6 +49,7 @@ INTEGRATION_DATA_KEYS = {
 # lung has a v1 and v2, v2 = ['ann_level_1','ann_level_2','ann_level_3','ann_level_4','ann_level_5','ann_finest_level']
 
 robjects.r('library(Seurat)')
+robjects.r('library(STdeconvolve)')
 robjects.r('library(stringr)')
 robjects.r('library(SeuratDisk)')
 robjects.r('library(Azimuth)')
@@ -76,6 +78,34 @@ robjects.r('''
            ''')
 
 robjects.r('''
+            # Generating reference-free cell deconvolution
+           RunSTDeconvolve <- function(read_input_file){
+
+                counts <- read_input_file@assays[[read_input_file@active.assay]]$counts
+                # Pulling from example from their GitHub
+                counts <- cleanCounts(counts,min.lib.size=100)
+                corpus <- restrictCorpus(counts, removeAbove=1.0,removeBelow=0.05)
+                ## feature select for genes
+                corpus <- restrictCorpus(counts, removeAbove=1.0, removeBelow = 0.05)
+                ## choose optimal number of cell-types
+                ldas <- fitLDA(t(as.matrix(corpus)), Ks = seq(2, 9, by = 1))
+                ## get best model results
+                optLDA <- optimalModel(models = ldas, opt = "min")
+                ## extract deconvolved cell-type proportions (theta) and transcriptional profiles (beta)
+                results <- getBetaTheta(optLDA, perc.filt = 0.05, betaScale = 1000)
+                deconProp <- results$theta
+                deconGexp <- results$beta
+
+                # Modifying column names in deconProp
+                colnames(deconProp) <- lapply(colnames(deconProp),function(i){paste("ST Topic",i,sep=" ")})
+           
+                read_input_file@assays[["stdeconvolve_results"]] <- CreateAssayObject(data=deconProp)
+
+                return(read_input_file)
+           }    
+           ''')
+
+robjects.r('''
             # General function for integration using reference object
            integrate_spatial <- function(input_file, organ_key){
 
@@ -86,8 +116,10 @@ robjects.r('''
                 if (organ_key == "kidneykpmp"){
                     print("Using KPMP Reference")
                     integrated_spatial_data <- integrate_kpmp_atlas(read_input_file)
-                } else {
+                } else if (organ_key %in% c("adiposeref","bonemarrowref","fetusref","heartref","humancortexref","kidneyref","lungref","pancreasref","mousecortexref","pbmcref","tonsilref")){
                     integrated_spatial_data <- RunAzimuth(read_input_file,organ_key)
+                } else {
+                    integrated_spatial_data <- RunSTDeconvolve(read_input_file)
                 }
 
                 output_path <- str_replace(input_file,paste(".",file_extension,sep=""),'_integrated.rds')

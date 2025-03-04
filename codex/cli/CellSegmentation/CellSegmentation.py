@@ -268,7 +268,7 @@ class SegmentationDataset:
             slide_annotations_gdf = gpd.GeoDataFrame.from_features(filtered_slide_annotations['features'])
             # Finding patch coordinates
             if self.patch_mode=='all':
-                available_bbox = gpd.GeoDataFrame.from_features(available_regions['features']).total_bounds
+                available_bbox = list(gpd.GeoDataFrame.from_features(available_regions['features']).total_bounds)
 
                 x_start = np.maximum(self.patch_size[0]/2,int(available_bbox[0]-(self.patch_size[0]/2)))
                 y_start = np.maximum(self.patch_size[1]/2,int(available_bbox[1]-(self.patch_size[1]/2)))
@@ -724,10 +724,6 @@ class CellModel:
 
         masks = None
         if self.model_type=='cellpose':
-            print(type(input_image))
-            print(np.shape(input_image))
-            print(np.unique(input_image))
-            print(input_image.dtype)
             input_image = input_image.astype(np.uint8)
             masks,flows,styles = self.model.eval(input_image,
                                           diameter = self.model_args['diameter'],
@@ -739,9 +735,6 @@ class CellModel:
             #masks = self.model.predict(input_image)
         
         if not masks is None:
-            print(type(masks))
-            print(np.shape(masks))
-            print(np.unique(masks))
             mask_shapes = self.mask_to_shape(masks,bbox)
         else:
             print('Masks is None')
@@ -752,7 +745,6 @@ class CellModel:
     def mask_to_shape(self, mask: np.ndarray, bbox:list)->list:
         mask_features = []
         for geo,val in rasterio.features.shapes(mask,mask=mask>0):
-            print(geo['coordinates'])
             mask_features.append({
                 'type': 'Feature',
                 'geometry': {
@@ -848,8 +840,8 @@ def main(args):
 
     # This can be added to the xml some other time
     model_args = {
-        'diameter': None,
-        #'cellprob_threshold': '',
+        'diameter': 4,
+        'cellprob_threshold': 0.0,
         'channels': [0,0]
     }
     cell_model = CellModel(
@@ -862,7 +854,6 @@ def main(args):
     cell_count = 0
     bbox_list = []
     with tqdm(cell_seg_dataset, total = len(cell_seg_dataset)) as pbar:
-        #pbar.set_description('Predicting on patches in SegmentationDataset')
         for idx, (patch,_) in enumerate(cell_seg_dataset):
             
             bbox = cell_seg_dataset.data[idx]['bbox']
@@ -870,10 +861,10 @@ def main(args):
                 'type': 'Feature',
                 'geometry': {
                     'type': 'Polygon',
-                    'coordinates': list(box(*bbox).exterior.coords),
-                    'properties': {
-                        'name': f'BBox {idx}'
-                    }
+                    'coordinates': [list(box(*bbox).exterior.coords)],
+                },
+                'properties': {
+                    'bbox_idx': idx
                 }
             })
             mask_features = cell_model.predict(patch,bbox)

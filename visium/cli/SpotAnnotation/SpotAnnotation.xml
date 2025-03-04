@@ -14,7 +14,7 @@
     <file reference='_girder_id_'>
       <name>counts_file</name>
       <label>Counts file</label>
-      <description>Counts file. rds or h5ad types supported. String is item id.</description>
+      <description>Counts file rds, h5ad, or h5 types supported.</description>
       <channel>input</channel>
       <index>0</index>
     </file>
@@ -74,5 +74,18 @@
       <description>If using one of the Gene Selection Methods above, pass the number of genes to include here. This parameter is ignored if a specific list of genes is passed. Set to 0 to ignore genes.</description>
       <default>25</default>
     </integer>
+    <file reference="_girder_id_">
+      <name>scale_factors</name>
+      <longflag>scale-factors</longflag>
+      <label>Scale Factors File</label>
+      <description>File containing scale factors from "hires" and "lores" to the full resolution.</description>
+      <default></default>
+    </file>
+    <file reference="_girder_id_">
+      <name>spot_coords</name>
+      <longflag>spot-coords</longflag>
+      <label>Spot Coordinates File</label>
+      <description>If you have a separate file that contains spot coordinates, include that here</description>
+    </file>
   </parameters>
 </executable>

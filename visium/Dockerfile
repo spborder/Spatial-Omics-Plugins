@@ -72,7 +72,8 @@ RUN apt-get update && \
     libfontconfig1-dev \
     libcairo2-dev \ 
     libharfbuzz-dev \
-    libfribidi-dev
+    libfribidi-dev \
+    libmagick++-dev
 
 ## Taken from Azimuth Dockerfile
 RUN mkdir lzf
@@ -92,6 +93,8 @@ RUN R -e 'remotes::install_version("Matrix",version="1.6.4",repos="https://cran.
 RUN R -e 'install.packages("SeuratObject",version=">= 5.0.2",repos="https://cran.r-project.org",dependencies=TRUE)'
 RUN Rscript install_R_packages.r BiocManager BSgenome.Hsapiens.UCSC.hg38 glmGamPoi GenomeInfoDb GenomicRanges TFBSTools JASPAR2020 EnsDb.Hsapiens.v86 IRanges Rsamtools S4Vectors
 RUN R -e 'remotes::install_github("satijalab/azimuth",ref="master",dependencies=TRUE)'
+RUN R -e 'remotes::install_github("ctlab/fgsea",dependencies=TRUE)'
+RUN R -e 'remotes::install_github("JEFworks-Lab/STdeconvolve",dependencies=TRUE)'
 
 ENV build_path=/build
 ENV PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
