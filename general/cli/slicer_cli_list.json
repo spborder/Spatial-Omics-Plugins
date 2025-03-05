@@ -1,0 +1,14 @@
+{
+    "CreateAnnotation": {
+        "type": "python"
+    },
+    "ExportAnnotations": {
+        "type": "python"
+    },
+    "FeatureExtraction": {
+        "type": "python"
+    },
+    "SpatialAggregation": {
+        "type": "python"
+    }
+}

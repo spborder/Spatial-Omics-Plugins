@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<executable>
+  <category>FUSION Plugins</category>
+  <title>Register Images</title>
+  <description>Register two image items and save the resulting merged image as a separate item.</description>
+  <version>0.1.0</version>
+  <documentation-url>https://github.com/spborder/Spatial-Omics-Plugins/</documentation-url>
+  <license>Apache 2.0</license>
+  <contributor>Sam Border (UFL)</contributor>
+  <acknowledgements>This work is part of efforts in digital pathology by the Sarder Lab: UFL.</acknowledgements>
+  <parameters>
+    <label>IO</label>
+    <description>Input/output parameters.</description>
+    <image reference="_girder_id_">
+      <name>base_image</name>
+      <label>Base Image</label>
+      <description>Base image which is left unaltered by registration.</description>
+      <channel>input</channel>
+      <index>0</index>
+    </image>
+    <image reference="_girder_id_">
+      <name>trans_image</name>
+      <label>Transformed Image</label>
+      <description>Image on which the affine transform is applied in order to align with the base image.</description>
+      <channel>input</channel>
+      <index>1</index>
+    </image>
+  </parameters>
+  <parameters advanced="true">
+    <label>Girder API URL and Key</label>
+    <description>A Girder API URL and token for Girder client</description>
+    <boolean>
+      <name>trans_image_scale</name>
+      <longflag>trans-image-scale</longflag>
+      <label>Transformed Image Relative Scale</label>
+      <description>If the MPP value for the Transformed Image is known to be different from the MPP value of the Base Image, input True here.</description>
+      <default>0</default>
+    </boolean>
+    <integer>
+      <name>downsample_dim</name>
+      <longflag>downsample-dim</longflag>
+      <label>Downsample Dimension</label>
+      <description>The maximum horizontal and vertical dimension value to rescale both the Base Image and the Transformed Image down to prior to calculating registration.</description>
+      <default>4192</default>
+    </integer>
+    <boolean>
+      <name>use_frame_index_1</name>
+      <longflag>use-frame-index-1</longflag>
+      <label>Use Frame Index for Base Image</label>
+      <description>Select this value to only use a specific frame in image 1 for the alignment. (Ignored for non-multi-frame images)</description>
+      <default>0</default>
+    </boolean>
+    <integer>
+      <name>frame_index_1</name>
+      <longflag>frame-index-1</longflag>
+      <label>Frame Index Base Image</label>
+      <description>Frame index in the Base Image to use as a basis for alignment with the Transformed Image.</description>
+    </integer>
+    <boolean>
+      <name>use_frame_index_2</name>
+      <longflag>use-frame-index-2</longflag>
+      <label>Use Frame Index for Transformed Image</label>
+      <description>Select this value to only use a specific frame in the Transformed Image for the alignment. (Ignored for non-multi-frame images)</description>
+      <default>0</default>
+    </boolean>
+    <integer>
+      <name>frame_index_2</name>
+      <longflag>frame-index-2</longflag>
+      <label>Frame Index Transformed Image</label>
+      <description>Frame index in the Transformed Image to use as a basis for alignment with the Base Image.</description>
+    </integer>
+    <string>
+      <name>annotation_id_1</name>
+      <longflag>annotation-id-1</longflag>
+      <label>Nuclei annotation ID in Base Image</label>
+      <description>Girder ID for nuclei annotations, if present. If not, image analysis methods are used to automatically segment nuclei.</description>
+    </string>
+    <string>
+      <name>annotation_id_2</name>
+      <longflag>annotation-id-2</longflag>
+      <label>Nuclei annotation ID in Transformed Image</label>
+      <description>Girder ID for nuclei annotations, if present. If not, image analysis methods are used to automatically segment nuclei.</description>
+    </string>
+    <boolean>
+      <name>is_histology_1</name>
+      <longflag>is-histology-1</longflag>
+      <label>Is the Base Image Histology?</label>
+      <description>Whether this image is a RGB histology image or not.</description>
+      <default>0</default>
+    </boolean>
+    <boolean>
+      <name>is_histology_2</name>
+      <longflag>is-histology-2</longflag>
+      <label>Is the Transformed Image Histology?</label>
+      <description>Whether this image is a RGB histology image or not.</description>
+      <default>0</default>
+    </boolean>
+    <string-enumeration>
+      <name>transform</name>
+      <longflag>trans-form</longflag>
+      <label>Type of Registration Transform</label>
+      <description>Select a type of transformation to apply for registration.</description>
+      <element>AFFINE</element>
+      <element>RIGID_BODY</element>
+      <default>RIGID_BODY</default>
+    </string-enumeration>
+    <boolean>
+      <name>merge_images</name>
+      <longflag>merge-images</longflag>
+      <label>Merge Images</label>
+      <description>Whether to create a new item with the merged image</description>
+      <default>0</default>
+    </boolean>
+    <image>
+      <name>output_merged_image</name>
+      <longflag>output-merged-image</longflag>
+      <label>Output Merged Image</label>
+      <description>File name and path to save merged image to</description>
+      <default></default>
+    </image>
+    <string>
+      <name>girderApiUrl</name>
+      <longflag>api-url</longflag>
+      <label>Girder API URL</label>
+      <description>A Girder API URL (e.g., https://girder.example.com:443/api/v1)</description>
+      <default></default>
+    </string>
+    <string>
+      <name>girderToken</name>
+      <longflag>token</longflag>
+      <label>Girder API Token</label>
+      <description>A Girder token identifying a user session</description>
+      <default></default>
+    </string>
+  </parameters>
+</executable>

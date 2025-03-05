@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<executable>
+  <category>FUSION Plugins</category>
+  <title>Cell Segmentation</title>
+  <description>Segment nuclei using Deep Learning</description>
+  <version>0.1.0</version>
+  <documentation-url>https://github.com/spborder/Spatial-Omics-Plugins/</documentation-url>
+  <license>Apache 2.0</license>
+  <contributor>Sam Border (UFL)</contributor>
+  <acknowledgements>This work is part of efforts in digital pathology by the Sarder Lab: UFL.</acknowledgements>
+  <parameters>
+    <label>IO</label>
+    <description>Input/output parameters.</description>
+    <image reference="_girder_id_">
+      <name>input_image</name>
+      <label>Input Image</label>
+      <description>Input Filename </description>
+      <channel>input</channel>
+      <index>0</index>
+    </image>
+    <region>
+      <name>input_region</name>
+      <label>Input Image Region</label>
+      <description>Select a rectangular region in the slide to run feature extraction on.</description>
+      <channel>input</channel>
+      <default>[-1,-1,-1,-1]</default>
+      <index>1</index>
+    </region>
+    <string-enumeration>
+      <name>method</name>
+      <label>Segmentation Method</label>
+      <description>What method to use to segment cells. Available options include DeepCell, CellPose, and Otsu's.</description>
+      <default>CellPose</default>
+      <element>CellPose</element>
+      <index>4</index>
+    </string-enumeration>
+  </parameters>
+  <parameters advanced="true">
+    <label>Girder API URL and Key</label>
+    <description>A Girder API URL and token for Girder client</description>
+    <integer>
+      <name>patch_size</name>
+      <longflag>patch-size</longflag>
+      <label>Patch Size</label>
+      <description>Size of patches to extract across selected region</description>
+      <default>224</default>
+    </integer>
+    <boolean>
+      <name>use_frame_index</name>
+      <longflag>use-frame-index</longflag>
+      <label>Use Frame Index</label>
+      <description>Whether or not to use the segmentation frame input argument</description>
+      <default>1</default>
+    </boolean>
+    <integer>
+      <name>segmentation_frame</name>
+      <longflag>segmentation-frame</longflag>
+      <label>Frame Index for Segmentation</label>
+      <description>If a specific frame should be used for segmentation, add that here.</description>
+      <default>0</default>
+    </integer>
+    <boolean>
+      <name>return_segmentation_region</name>
+      <longflag>return-segmentation-region</longflag>
+      <label>Return Segmentation Region</label>
+      <description>If you have selected a region over which to segment cells, select this option to return an annotation of that bounding box as well.</description>
+      <default>0</default>
+    </boolean>
+    <string>
+      <name>girderApiUrl</name>
+      <longflag>api-url</longflag>
+      <label>Girder API URL</label>
+      <description>A Girder API URL (e.g., https://girder.example.com:443/api/v1)</description>
+      <default></default>
+    </string>
+    <string>
+      <name>girderToken</name>
+      <longflag>token</longflag>
+      <label>Girder API Token</label>
+      <description>A Girder token identifying a user session</description>
+      <default></default>
+    </string>
+  </parameters>
+</executable>
