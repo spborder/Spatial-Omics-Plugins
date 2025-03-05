@@ -6,8 +6,9 @@ import sys
 from ctk_cli import CLIArgumentParser
 import girder_client
 
-import rpy2.robjects as robjects
-from rpy2.robjects import pandas2ri
+#import rpy2.robjects as robjects
+#from rpy2.robjects import pandas2ri
+import subprocess
 
 
 ORGAN_REF_KEY = {
@@ -48,155 +49,6 @@ INTEGRATION_DATA_KEYS = {
 # mouse pansci = ['Main_cell_type']
 # lung has a v1 and v2, v2 = ['ann_level_1','ann_level_2','ann_level_3','ann_level_4','ann_level_5','ann_finest_level']
 
-robjects.r('library(Seurat)')
-robjects.r('library(STdeconvolve)')
-robjects.r('library(stringr)')
-robjects.r('library(SeuratDisk)')
-robjects.r('library(Azimuth)')
-robjects.r('library(SeuratData)')
-robjects.r('library(patchwork)')
-robjects.r('library(dplyr)')
-robjects.r('library(tools)')
-robjects.r('options(timeout=300)')
-
-robjects.r('''
-            # Function for reading in different types of files
-            read_data_formats <- function(input_file_path){
-                print(input_file_path)
-                file_extension <- file_ext(input_file_path)
-                print(file_extension)
-                if (tolower(file_extension) == "rds"){
-                    read_file <- readRDS(input_file_path)
-                } else if (tolower(file_extension) == "h5"){
-                    read_file <- Read10X_h5(input_file_path)
-                } else if (tolower(file_extension) == "h5ad"){
-                    read_file <- LoadH5Seurat(input_file_path)
-                }
-           
-                return(read_file)
-            }
-           ''')
-
-robjects.r('''
-            # Generating reference-free cell deconvolution
-           RunSTDeconvolve <- function(read_input_file){
-
-                counts <- read_input_file@assays[[read_input_file@active.assay]]$counts
-                # Pulling from example from their GitHub
-                counts <- cleanCounts(counts,min.lib.size=100)
-                corpus <- restrictCorpus(counts, removeAbove=1.0,removeBelow=0.05)
-                ## feature select for genes
-                corpus <- restrictCorpus(counts, removeAbove=1.0, removeBelow = 0.05)
-                ## choose optimal number of cell-types
-                ldas <- fitLDA(t(as.matrix(corpus)), Ks = seq(2, 9, by = 1))
-                ## get best model results
-                optLDA <- optimalModel(models = ldas, opt = "min")
-                ## extract deconvolved cell-type proportions (theta) and transcriptional profiles (beta)
-                results <- getBetaTheta(optLDA, perc.filt = 0.05, betaScale = 1000)
-                deconProp <- results$theta
-                deconGexp <- results$beta
-
-                # Modifying column names in deconProp
-                colnames(deconProp) <- lapply(colnames(deconProp),function(i){paste("ST Topic",i,sep=" ")})
-           
-                read_input_file@assays[["stdeconvolve_results"]] <- CreateAssayObject(data=deconProp)
-
-                return(read_input_file)
-           }    
-           ''')
-
-robjects.r('''
-            # General function for integration using reference object
-           integrate_spatial <- function(input_file, organ_key){
-
-                # Reading input file
-                read_input_file <- read_data_formats(input_file)
-                file_extension <- file_ext(input_file)
-           
-                if (organ_key == "kidneykpmp"){
-                    print("Using KPMP Reference")
-                    integrated_spatial_data <- integrate_kpmp_atlas(read_input_file)
-                } else if (organ_key %in% c("adiposeref","bonemarrowref","fetusref","heartref","humancortexref","kidneyref","lungref","pancreasref","mousecortexref","pbmcref","tonsilref")){
-                    integrated_spatial_data <- RunAzimuth(read_input_file,organ_key)
-                } else {
-                    integrated_spatial_data <- RunSTDeconvolve(read_input_file)
-                }
-
-                output_path <- str_replace(input_file,paste(".",file_extension,sep=""),'_integrated.rds')
-                saveRDS(integrated_spatial_data, output_path)
-           }
-           ''')
-
-robjects.r('''
-            # Function for integration using KPMP atlas
-            integrate_kpmp_atlas <- function(spatial){
-                DefaultAssay(spatial) <- "SCT"
-                
-                atlas_path <- "../KidneyAtlas_snCV3_20percent.h5Seurat"
-                kpmp_atlas <- LoadH5Seurat(atlas_path, assays = c("counts","scale.data"),tools = TRUE,images=False)
-           
-                Idents(kpmp_atlas) <- kpmp_atlas@meta.data$subclass.l2
-           
-                kpmp_atlas <- subset(kpmp_atlas, idents = "NA", invert = T)
-                kpmp_atlas <- UpdateSeuratObject(kpmp_atlas)
-                kpmp_atlas[["RNA"]] <- as(object = kpmp_atlas[["RNA"]],Class="SCTAssay")
-
-                DefaultAssay(kpmp_atlas) <- "RNA"
-                Idents(kpmp_atlas) <- kpmp_atlas@meta.data[["subclass.l2"]]
-           
-                anchors <- FindTransferAnchors(
-                    reference = kpmp_atlas, query = spatial, normalization.method = "SCT",
-                    query.assay = "SCT", recompute.residuals = FALSE
-                )
-
-                predictions.assay <- TransferData(
-                    anchorset = anchors, refdata = kpmp_atlas@meta.data[["subclass.l2"]],
-                    prediction.assay = TRUE,
-                    weight.reduction = spatial[["pca"]], dims = 1:30
-                )
-                spatial[["pred_subclass_l2"]] <- predictions.assay
-           
-                df_pred <- predictions.assay@data
-                max_pred <- apply(df_pred, 2, function(x) max.col(t(x),"first"))
-                max_pred_val <- apply(df_pred, 2, function(x) max(t(x)))
-                max_pred <- as.data.frame(max_pred)
-                max_pred$Seurat_subset <- rownames(df_pred)[max_pred$max_pred]
-                max_pred$score <- max_pred_val
-                max_pred$Barcode <- rownames(max_pred)
-           
-                spatial@meta.data.subclass.l2 <- max_pred$Seurat_subset
-                spatial@meta.data$subclass.l2_score <- max_pred$score
-           
-                Idents(kpmp_atlas) <- kpmp_atlas@meta.data[["subclass.l1"]]
-           
-                anchors <- FindTransferAnchors(
-                    reference = kpmp_atlas, query = spatial, normalization.method = "SCT",
-                    query.assay = "SCT", recompute.residuals = FALSE
-                )
-                predictions.assay <- TransferData(
-                    anchorset = anchors, refdata = kpmp_atlas@meta.data[["subclass.l1"]],
-                    prediction.assay = TRUE,
-                    weight.reduction = spatial[["pca"]],dims = 1:30
-                )
-           
-                spatial[["pred_subclass_l1"]] <- predictions.assay
-           
-                df_pred <- predictions.assay@data
-                max_pred <- apply(df_pred, 2, function(x) max.col(t(x), "first"))
-                max_pred_val <- apply(df_pred,2, function(x) max(t(x)))
-           
-                max_pred <- as.data.frame(max_pred)
-                max_pred$Seurat_subset <- rownames(df_pred)[max_pred$max_pred]
-                max_pred$score <- max_pred_val
-                max_pred$Barcode <- rownames(max_pred)
-           
-                spatial@meta.data$subclass.l1 <- max_pred$Seurat_subset
-                spatial@meta.data$subclass.l1_score <- max_pred$score
-           
-                return(spatial)
-            }
-           ''')
-
 
 def main(args):
 
@@ -224,11 +76,13 @@ def main(args):
         print(os.listdir(os.getcwd()+'/'))
 
         print(f'Running cell deconvolution for: {args.organ}')
-        integrator = robjects.globalenv['integrate_spatial']
-        integrator(
-            file_info['name'],
-            ORGAN_REF_KEY[args.organ]
-        )
+        #integrator = robjects.globalenv['integrate_spatial']
+        #integrator(
+        #    file_info['name'],
+        #    ORGAN_REF_KEY[args.organ]
+        #)
+
+        subprocess.call(['Rscript', '.././.cell_deconvolution.r', '"'+file_info['name']+'"','"'+ORGAN_REF_KEY[args.organ]+'"'])
 
         print(os.listdir(os.getcwd()+'/'))
 

@@ -48,9 +48,8 @@ setup(
         # scientific packages
         'girder-slicer-cli-web',
         'girder-client',
-        'fusion-tools>=3.1.3',
+        'fusion-tools>=3.3.5',
         'ctk-cli',
-        'rpy2',
     ],
     license='Apache Software License 2.0',
     keywords='visium_processing',

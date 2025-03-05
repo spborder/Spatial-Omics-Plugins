@@ -73,7 +73,6 @@ def main(args):
         )
 
 
-
     # Finding all output csv files
     output_csvs = [i for i in os.listdir(os.getcwd()+'/') if 'csv' in i and not i=='spot_coordinates.csv']
     print(f'Output CSV files: {output_csvs}')
@@ -124,9 +123,6 @@ def main(args):
             for s,p in zip(visium_spots['features'],property_list):
                 s['properties'] = s['properties'] | p
         
-        # Converting to histomics format just to add a "name"
-        histomics_spots = geojson_to_histomics(visium_spots)
-
         # If a scalefactors_json.json is present
         if not args.scale_factors is None:
             scale_factors_file_info = gc.get(f'/file/{args.scale_factors}')
@@ -134,9 +130,15 @@ def main(args):
                 args.scale_factors,
                 path = f'{os.getcwd()}/{scale_factors_file_info["name"]}'
             )
-            
-            histomics_spots = geojson.utils.map_geometries(lambda g: geojson.utils.map_tuples(lambda c: (c[0]*scale_factors['tissue_hires_scalef'],c[1]*scale_factors['tissue_hires_scalef']),g),fullres_anns)
 
+            with open(f'{os.getcwd()}/{scale_factors_file_info["name"]}','r') as f:
+                scale_factors = json.load(f)
+                f.close()
+            
+            visium_spots = geojson.utils.map_geometries(lambda g: geojson.utils.map_tuples(lambda c: (c[0]*scale_factors['tissue_hires_scalef'],c[1]*scale_factors['tissue_hires_scalef']),g),visium_spots)
+
+        # Converting to histomics format just to add a "name"
+        histomics_spots = geojson_to_histomics(visium_spots)
 
         gc.post(
             f'/annotation/item/{file_info["itemId"]}?token={args.girderToken}',

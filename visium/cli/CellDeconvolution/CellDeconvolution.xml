@@ -38,7 +38,7 @@
       <element>Azimuth Tonsil Reference</element>
       <element>ST Deconvolve</element>
       <element>Not Listed</element>
-      <default>KPMP Atlas kidney</default>
+      <default>KPMP Atlas Kidney</default>
     </string-enumeration>
   </parameters>
   <parameters advanced="true">
