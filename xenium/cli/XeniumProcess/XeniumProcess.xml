@@ -11,19 +11,26 @@
   <parameters>
     <label>IO</label>
     <description>Input/output parameters.</description>
-    <file>
-      <name>counts_file</name>
-      <label>Counts file</label>
-      <description>Counts file. rds or h5ad types supported. String is item id.</description>
+    <file reference='_girder_id_'>
+      <name>coords_file</name>
+      <label>Coordinates file</label>
+      <description>Coordinates for either cell boundaries or cell centroids with cell/nucleus area as a column.</description>
       <channel>input</channel>
       <index>0</index>
     </file>
-    <image reference='_girder_id_'>
-      <name>input_files</name>
-      <label>Input Image</label>
-      <description>input filename </description>
+    <file reference='_girder_id_'>
+      <name>cell_info</name>
+      <label>Cell-level Data</label>
+      <description>Cell-level data in CSV format where one colunn is "cell-id" indicating unique cell identity and remaining columns contain one property to be assigned to that cell.</description>
       <channel>input</channel>
       <index>1</index>
+    </file>
+    <image reference='_girder_id_'>
+      <name>image_item</name>
+      <label>Input Image</label>
+      <description>Item to which the generated annotations will be attached.</description>
+      <channel>input</channel>
+      <index>2</index>
     </image>
   </parameters>
   <parameters advanced="true">

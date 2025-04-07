@@ -48,9 +48,14 @@ setup(
         # scientific packages
         'girder-slicer-cli-web',
         'girder-client',
-        'fusion-tools>=3.0.6',
+        'fusion-tools>=3.5',
         'ctk-cli',
-        'rpy2',
+        'large-image[sources]',
+        'large-image-converter',
+        'scikit-learn',
+        'pyarrow',
+        'pystackreg',
+        'rasterio'
     ],
     license='Apache Software License 2.0',
     keywords='xenium',

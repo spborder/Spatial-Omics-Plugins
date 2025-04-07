@@ -17,8 +17,8 @@ This set of plugins uses *fusion-tools*, a package created for the analysis of s
     3. `SpatialAggregation`
         - This plugin enables the spatial aggregation of properties within other structures. Aggregated properties are derived from intersecting structures' "user" field and will be transferred to the overlapping structure's (or structures') "user" field.
 
-2. "codex"
-    - This includes plugins for processing *CODEX* (Co-Detection by Indexing) or *MxIF* (Multiplexed Immunofluorescence) slides.
+2. "PhenoCycler"
+    - This includes plugins for processing *PhenoCycler* (formerly, CODEX (Co-Detection by Indexing)) or *MxIF* (Multiplexed Immunofluorescence) slides.
 
     1. `CellSegmentation`
         - This plugin includes CellPose for cell segmentation. Updating this plugin for other methods of cell segmentation should be straightforward as the patching->prediction->recombination procedure should be the same regardless of the model.
@@ -41,6 +41,8 @@ This set of plugins uses *fusion-tools*, a package created for the analysis of s
 5. "xenium"
     - This includes plugins for *10x Xenium*.
 
+    1. `XeniumProcess`
+        - This plugin creates cell annotations from a provided CSV file containing either cell centroid and area information or cell boundaries. 
 
 
 
