@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<executable>
+  <category>FUSION Plugins</category>
+  <title>Spatial Aggregation</title>
+  <description>Spatially aggregate properties from one annotation to intersecting structures</description>
+  <version>0.1.0</version>
+  <documentation-url>https://github.com/spborder/Spatial-Omics-Plugins/</documentation-url>
+  <license>Apache 2.0</license>
+  <contributor>Sam Border (UFL)</contributor>
+  <acknowledgements>This work is part of efforts in digital pathology by the Sarder Lab: UFL.</acknowledgements>
+  <parameters>
+    <label>IO</label>
+    <description>Input/output parameters.</description>
+    <image reference="_girder_id_">
+      <name>input_image</name>
+      <label>Input Image</label>
+      <description>Input Filename </description>
+      <channel>input</channel>
+      <index>0</index>
+    </image>
+    <string>
+      <name>base_annotation</name>
+      <label>Base Annotation</label>
+      <description>Name of the annotation layer containing properties you'd like to </description>
+      <index>1</index>
+    </string>
+    <string>
+      <name>agg_annotation</name>
+      <label>Aggregation Annotation</label>
+      <description>Comma-separated list of annotation layers you'd like to receive properties from intersecting elements in "base annotation"</description>
+      <index>2</index>
+    </string>
+  </parameters>
+  <parameters advanced="true">
+    <label>Girder API URL and Key</label>
+    <description>A Girder API URL and token for Girder client</description>
+    <string>
+      <name>girderApiUrl</name>
+      <longflag>api-url</longflag>
+      <label>Girder API URL</label>
+      <description>A Girder API URL (e.g., https://girder.example.com:443/api/v1)</description>
+      <default></default>
+    </string>
+    <string>
+      <name>girderToken</name>
+      <longflag>token</longflag>
+      <label>Girder API Token</label>
+      <description>A Girder token identifying a user session</description>
+      <default></default>
+    </string>
+  </parameters>
+</executable>

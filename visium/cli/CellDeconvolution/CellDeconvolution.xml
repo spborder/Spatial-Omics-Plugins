@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<executable>
+  <category>FUSION Plugins</category>
+  <title>10x Visium Processing</title>
+  <description>Generate Visium spot annotations from spot centroid coordinates and cell composition (omics) files.</description>
+  <version>0.1.0</version>
+  <documentation-url>https://github.com/spborder/Spatial-Omics-Plugins/</documentation-url>
+  <license>Apache 2.0</license>
+  <contributor>Samuel Border</contributor>
+  <acknowledgements>This work is part of efforts in digital pathology by the Sarder Lab: UFL.</acknowledgements>
+  <parameters>
+    <label>IO</label>
+    <description>Input/output parameters.</description>
+    <file reference="_girder_id_">
+      <name>counts_file</name>
+      <label>Counts file</label>
+      <description>Counts file can either be RDS, H5AD, or "filtered_feature_bc_matrix.h5" output of *spaceranger* pipeline.</description>
+      <channel>input</channel>
+      <index>0</index>
+    </file>
+    <string-enumeration>
+      <name>organ</name>
+      <label>Organ</label>
+      <description>Select which organ your upload is of. If it is not listed or you want to skip cell deconvolution, select "Not Listed"</description>
+      <channel>input</channel>
+      <index>1</index>
+      <element>Azimuth Adipose Reference</element>
+      <element>Azimuth Bone Marrow Reference</element>
+      <element>Azimuth Fetus Reference</element>
+      <element>Azimuth Heart Reference</element>
+      <element>Azimuth Human Cortex Reference</element>
+      <element>Azimuth Kidney Reference</element>
+      <element>KPMP Atlas Kidney</element>
+      <element>Azimuth Lung Reference</element>
+      <element>Azimuth Pancreas Reference</element>
+      <element>Azimuth Mouse Cortex Reference</element>
+      <element>Azimuth PBMC Reference</element>
+      <element>Azimuth Tonsil Reference</element>
+      <element>ST Deconvolve</element>
+      <element>Not Listed</element>
+      <default>KPMP Atlas Kidney</default>
+    </string-enumeration>
+  </parameters>
+  <parameters advanced="true">
+    <label>Girder API URL and Key</label>
+    <description>A Girder API URL and token for Girder client</description>
+    <string>
+      <name>girderApiUrl</name>
+      <longflag>api-url</longflag>
+      <label>Girder API URL</label>
+      <description>A Girder API URL (e.g., https://girder.example.com:443/api/v1)</description>
+      <default></default>
+    </string>
+    <string>
+      <name>girderToken</name>
+      <longflag>token</longflag>
+      <label>Girder API Token</label>
+      <description>A Girder token</description>
+      <default></default>
+    </string>
+  </parameters>
+</executable>

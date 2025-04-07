@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<executable>
+  <category>FUSION Plugins</category>
+  <title>Pathomic Feature Extraction</title>
+  <description>Calculate descriptive morphometrics for pathological structures</description>
+  <version>0.1.0</version>
+  <documentation-url>https://github.com/spborder/Spatial-Omics-Plugins/</documentation-url>
+  <license>Apache 2.0</license>
+  <contributor>Sam Border (UFL)</contributor>
+  <acknowledgements>This work is part of efforts in digital pathology by the Sarder Lab: UFL.</acknowledgements>
+  <parameters>
+    <label>IO</label>
+    <description>Input/output parameters.</description>
+    <image reference="_girder_id_">
+      <name>input_image</name>
+      <label>Input Image</label>
+      <description>Input Filename </description>
+      <channel>input</channel>
+      <index>0</index>
+    </image>
+    <boolean>
+      <name>extract_sub_compartments</name>
+      <longflag>extract-sub-compartments</longflag>
+      <label>Extract Sub Compartments</label>
+      <description>Whether or not to extract sub-compartments prior to feature extraction.</description>
+      <default>0</default>
+    </boolean>
+    <integer>
+      <name>hematoxylin_threshold</name>
+      <longflag>hematoxylin-threshold</longflag>
+      <label>Hematoxylin Threshold</label>
+      <description>Threshold to apply for hematoxylin segmentation (only used if extract_sub_compartments is True)</description>
+      <default>150</default>
+    </integer>
+    <integer>
+      <name>eosinophilic_threshold</name>
+      <longflag>eosinophilic-threshold</longflag>
+      <label>Eosinophilic Threshold</label>
+      <description>Threshold to apply for eosinophilic segmentation (only used if extract_sub_compartments is True)</description>
+      <default>30</default>
+    </integer>
+    <integer>
+      <name>hematoxylin_min_size</name>
+      <longflag>hematoxylin-min-size</longflag>
+      <label>Hematoxylin Minimum Size</label>
+      <description>Minimum size for hematoxylin objects (only used if extract_sub_compartments is True)</description>
+      <default>40</default>
+    </integer>
+    <integer>
+      <name>eosinophilic_min_size</name>
+      <longflag>eosinophilic-min-size</longflag>
+      <label>Eosinophilic Minimum Size</label>
+      <description>Minimum size for eosinophilic objects (only used if extract_sub_compartments is True)</description>
+      <default>20</default>
+    </integer>
+  </parameters>
+  <parameters advanced="true">
+    <label>Girder API URL and Key</label>
+    <description>A Girder API URL and token for Girder client</description>
+    <boolean>
+      <name>save_to_files</name>
+      <longflag>save-to-files</longflag>
+      <label>Save to Item Files?</label>
+      <description>Check this box to save the extracted features to the "Files" section for this slide</description>
+      <default>1</default>
+    </boolean>
+    <boolean>
+      <name>save_to_elements</name>
+      <longflag>save-to-elements</longflag>
+      <label>Save to each element?</label>
+      <description>Check this box to save each element's features to the "user" field in the annotation file</description>
+      <default>1</default>
+    </boolean>
+    <string>
+      <name>girderApiUrl</name>
+      <longflag>api-url</longflag>
+      <label>Girder API URL</label>
+      <description>A Girder API URL (e.g., https://girder.example.com:443/api/v1)</description>
+      <default></default>
+    </string>
+    <string>
+      <name>girderToken</name>
+      <longflag>token</longflag>
+      <label>Girder API Token</label>
+      <description>A Girder token identifying a user session</description>
+      <default></default>
+    </string>
+  </parameters>
+</executable>
