@@ -100,7 +100,7 @@ class CellModel:
             #masks = self.model.predict(input_image)
         
         if not masks is None:
-            mask_shapes = self.mask_to_shape(masks,bbox)
+            mask_shapes = self.mask_to_shape(masks[0],bbox)
         else:
             print('Masks is None')
             mask_shapes = []
@@ -109,6 +109,7 @@ class CellModel:
 
     def mask_to_shape(self, mask: np.ndarray, bbox:list)->list:
         mask_features = []
+        
         for geo,val in rasterio.features.shapes(mask,mask=mask>0):
             mask_features.append({
                 'type': 'Feature',
