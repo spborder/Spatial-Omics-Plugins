@@ -1,6 +1,7 @@
 FROM python:3.11
 
 LABEL maintainer="Sam Border - Computational Microscopy and Imaging Laboratory. <samuel.border@medicine.ufl.edu>"
+LABEL com.nvidia.volumes.needed=nvidia_driver
 
 RUN apt-get update && \
     apt-get autoremove && \

@@ -66,6 +66,13 @@
       <description>If you have selected a region over which to segment cells, select this option to return an annotation of that bounding box as well.</description>
       <default>0</default>
     </boolean>
+    <boolean>
+      <name>use_gpu</name>
+      <longflag>use-gpu</longflag>
+      <label>Use GPU</label>
+      <description>Whether or not to use a GPU if available</description>
+      <default>1</default>
+    </boolean>
     <string>
       <name>girderApiUrl</name>
       <longflag>api-url</longflag>

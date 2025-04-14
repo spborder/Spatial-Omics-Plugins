@@ -36,8 +36,6 @@ import geopandas as gpd
 import large_image
 from tqdm import tqdm
 
-from fusion_tools.utils.shapes import process_filters_queries
-
 from shapely.geometry import shape, box, Polygon
 from shapely.validation import make_valid
 from shapely.ops import unary_union
@@ -64,7 +62,14 @@ class CellModel:
         self.model_args = model_args
 
         if self.model_type=='cellpose':
-            self.model = models.CellposeModel(pretrained_model = '../.cellpose/models/tissuenet_cp3',gpu=True)
+            import torch
+
+            if torch.cuda.is_available() and self.model_args['use_gpu']:
+                use_gpu = True
+            else:
+                use_gpu = False
+
+            self.model = models.CellposeModel(pretrained_model = '../.cellpose/models/cyto3',gpu=use_gpu)
         elif self.model_type=='deepcell':
             raise NotImplementedError
             """
@@ -76,15 +81,18 @@ class CellModel:
             """
         else:
             raise NotImplementedError
+        
+        print(f'Model Loaded: {self.model_type}')
 
     def predict(self, input_image, bbox):
 
         masks = None
         if self.model_type=='cellpose':
             input_image = input_image.astype(np.uint8)
-            masks,flows,styles = self.model.eval(input_image,
+            masks,flows,styles = self.model.eval([input_image],
                                           diameter = self.model_args['diameter'],
                                           #cellprob_threshold = self.model_args['cellprob_threshold'],
+                                          channel_axis=2,
                                           channels = self.model_args['channels'])
         
         elif self.model_type=='deepcell':
@@ -200,7 +208,8 @@ def main(args):
     model_args = {
         'diameter': 1,
         'cellprob_threshold': 0.0,
-        'channels': [0,0]
+        'channels': [0,0],
+        'use_gpu': args.use_gpu
     }
     cell_model = CellModel(
         model_type = args.method,
