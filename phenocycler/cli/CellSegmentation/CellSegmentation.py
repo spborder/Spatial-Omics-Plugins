@@ -89,18 +89,16 @@ class CellModel:
         masks = None
         if self.model_type=='cellpose':
             input_image = input_image.astype(np.uint8)
-            masks,flows,styles = self.model.eval([input_image],
-                                          diameter = self.model_args['diameter'],
-                                          #cellprob_threshold = self.model_args['cellprob_threshold'],
-                                          channel_axis=2,
-                                          channels = self.model_args['channels'])
+            masks,flows,styles = self.model.eval([input_image],channel_axis=2)
         
         elif self.model_type=='deepcell':
             raise NotImplementedError
             #masks = self.model.predict(input_image)
         
         if not masks is None:
-            mask_shapes = self.mask_to_shape(masks[0],bbox)
+            mask_shapes = []
+            for m in masks:
+                mask_shapes.extend(self.mask_to_shape(m,bbox))
         else:
             print('Masks is None')
             mask_shapes = []
@@ -207,7 +205,7 @@ def main(args):
 
     # This can be added to the xml some other time
     model_args = {
-        'diameter': 1,
+        'diameter': None,
         'cellprob_threshold': 0.0,
         'channels': [0,0],
         'use_gpu': args.use_gpu
@@ -253,54 +251,66 @@ def main(args):
 
     pbar.close()   
 
-    annotations_geo = all_cells_gdf.to_geo_dict(show_bbox=True)
-    annotations_geo['properties'] = {
-        'name': 'Segmented Cells'
+    if not all_cells_gdf.empty:
+        annotations_geo = all_cells_gdf.to_geo_dict(show_bbox=True)
+        annotations_geo['properties'] = {
+            'name': 'Segmented Cells'
+        }
+
+        print(f'Found: {len(annotations_geo["features"])} Cells!')
+        new_annotations = geojson_to_histomics(annotations_geo)
+
+        gc.post(
+            f'/annotation/item/{image_id}?token={args.girderToken}',
+            data = json.dumps(new_annotations),
+            headers = {
+                'X-HTTP-Method': 'POST',
+                'Content-Type': 'application/json'
+            }
+        )
+
+        if args.return_segmentation_region and not region_annotation is None:
+            bboxes = geojson_to_histomics(
+                {
+                    'type': 'FeatureCollection',
+                    'properties': {
+                        'name': 'Segmentation Patches'
+                    },
+                    'features': bbox_list
+                }
+            )
+
+            gc.post(
+                f'/annotation/item/{image_id}?token={args.girderToken}',
+                data = json.dumps(bboxes),
+                headers = {
+                    'X-HTTP-Method': 'POST',
+                    'Content-Type': 'application/json'
+                }
+            )
+
+            gc.post(
+                f'/annotation/item/{image_id}?token={args.girderToken}',
+                data = json.dumps(region_annotation),
+                headers = {
+                    'X-HTTP-Method': 'POST',
+                    'Content-Type': 'application/json'
+                }
+            )
+
+
+    # Putting job metadata
+    job_submitter = gc.get('/user/me')
+    job_meta = {
+        'patch_size': args.patch_size,
+        'use_gpu': args.use_gpu,
+        'segmentation_frame': args.segmentation_frame,
+        'use_frame_index': args.use_frame_index,
+        'input_region': args.input_region,
+        'user': job_submitter['login']
     }
 
-    print(f'Found: {len(annotations_geo["features"])} Cells!')
-    new_annotations = geojson_to_histomics(annotations_geo)
-
-    gc.post(
-        f'/annotation/item/{image_id}?token={args.girderToken}',
-        data = json.dumps(new_annotations),
-        headers = {
-            'X-HTTP-Method': 'POST',
-            'Content-Type': 'application/json'
-        }
-    )
-
-    if args.return_segmentation_region and not region_annotation is None:
-        bboxes = geojson_to_histomics(
-            {
-                'type': 'FeatureCollection',
-                'properties': {
-                    'name': 'Segmentation Patches'
-                },
-                'features': bbox_list
-            }
-        )
-
-        gc.post(
-            f'/annotation/item/{image_id}?token={args.girderToken}',
-            data = json.dumps(bboxes),
-            headers = {
-                'X-HTTP-Method': 'POST',
-                'Content-Type': 'application/json'
-            }
-        )
-
-        gc.post(
-            f'/annotation/item/{image_id}?token={args.girderToken}',
-            data = json.dumps(region_annotation),
-            headers = {
-                'X-HTTP-Method': 'POST',
-                'Content-Type': 'application/json'
-            }
-        )
-
-
-
+    gc.put(f'/item/{args.input_image}/metadata',parameters={'metadata': job_meta})
 
 
 if __name__=='__main__':

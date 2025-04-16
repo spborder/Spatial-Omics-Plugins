@@ -93,6 +93,18 @@ def main(args):
             itemId = file_info['itemId'],
             filepath = f'./{file_info["name"].replace("."+file_ext,"_integrated.rds")}'
         )
+
+        # Putting job parameters to item metadata:
+        job_submitter = gc.get('/user/me')
+        job_meta = {
+            'counts_file': args.counts_file,
+            'output_item': file_info['itemId'],
+            'organ': args.organ,
+            'user': job_submitter['login']
+        }
+
+        gc.put(f'/item/{file_info["itemId"]}/metadata',parameters={'metadata': job_meta})
+
         
 if __name__=='__main__':
     main(CLIArgumentParser().parse_args())

@@ -263,6 +263,25 @@ def main(args):
                 data = json.dumps(put_dict)
             )
 
+    # Putting job parameters to item metadata:
+    job_submitter = gc.get('/user/me')
+    job_meta = {
+        'input_image': args.input_image,
+        'extract_sub_compartments': args.extract_sub_compartments,
+        'save_to_elements': args.save_to_elements,
+        'save_to_files': args.save_to_files,
+        'user': job_submitter['login']
+    }
+
+    if args.extract_sub_compartments:
+        job_meta = job_meta | {
+            'eosinophilic_min_size': args.eosinophilic_min_size,
+            'eosinophilic_threshold': args.eosinophilic_threshold,
+            'hematoxylin_min_size': args.hematoxylin_min_size,
+            'hematoxylin_threshold': args.hematoxylin_threshold
+        }
+
+    gc.put(f'/item/{args.input_image}/metadata',parameters={'metadata': job_meta})
 
 def test():
     

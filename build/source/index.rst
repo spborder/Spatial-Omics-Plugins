@@ -6,10 +6,9 @@
 Spatial Omics Plugins documentation
 ===================================
 
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
+The following are overviews of processing plugins which may be applied to different types of spatial --omics assays.
 
+These processing workflows are included in the base instance of FUSION (Functional Unit State Identification in WSIs). Docker images for each are available on Docker Hub under the username "fusionplugins"
 
 .. toctree::
    :maxdepth: 2
