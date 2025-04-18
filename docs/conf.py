@@ -21,7 +21,7 @@ extensions = [
     'sphinx_rtd_theme'
 ]
 
-templates_path = ['./source/_templates']
+templates_path = ['source/_templates']
 exclude_patterns = []
 
 
@@ -31,4 +31,4 @@ exclude_patterns = []
 
 html_theme = 'sphinx_rtd_theme'
 html_favicon = './favicon.ico'
-html_static_path = ['./source/_static']
+html_static_path = ['source/_static']
