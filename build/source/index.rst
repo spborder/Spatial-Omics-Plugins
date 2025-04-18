@@ -12,5 +12,12 @@ These processing workflows are included in the base instance of FUSION (Function
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Plugins:
+
+   general
+   visium
+   xenium
+   phenocycler
+   visiumhd
+
 
