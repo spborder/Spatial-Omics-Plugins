@@ -8,6 +8,8 @@ This includes creation of spot annotations and cell deconvolution using a variet
 CellDeconvolution
 ------------------
 
+This CLI uses spot-level transcriptomics data to derive cell composition per-spot.
+
 
 SpotAnnotation
 ---------------
