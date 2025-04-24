@@ -48,7 +48,7 @@ setup(
         # scientific packages
         'girder-slicer-cli-web',
         'girder-client',
-        'fusion-tools>=3.3.5',
+        'fusion-tools>=3.5.50',
         'ctk-cli',
     ],
     license='Apache Software License 2.0',

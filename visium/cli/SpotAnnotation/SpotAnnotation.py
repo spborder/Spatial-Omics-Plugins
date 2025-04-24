@@ -135,7 +135,12 @@ def main(args):
                 scale_factors = json.load(f)
                 f.close()
             
-            visium_spots = geojson.utils.map_geometries(lambda g: geojson.utils.map_tuples(lambda c: (c[0]*scale_factors['tissue_hires_scalef'],c[1]*scale_factors['tissue_hires_scalef']),g),visium_spots)
+            if 'tissue_hires_scalef' in scale_factors:
+                scale_val = scale_factors['tissue_hires_scalef']
+            elif 'hires' in scale_factors:
+                scale_val = scale_factors['hires']
+
+            visium_spots = geojson.utils.map_geometries(lambda g: geojson.utils.map_tuples(lambda c: (c[0]*scale_val,c[1]*scale_val),g),visium_spots)
 
         # Converting to histomics format just to add a "name"
         histomics_spots = geojson_to_histomics(visium_spots)
