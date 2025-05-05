@@ -16,6 +16,7 @@ from fusion_tools.feature_extraction import ParallelFeatureExtractor
 import geopandas as gpd
 from shapely.geometry import shape
 from fusion_tools.handler.dsa_handler import DSAHandler
+from fusion_tools.utils.shapes import histomics_to_geojson
 
 from skimage.segmentation import watershed
 from skimage import exposure
@@ -64,8 +65,8 @@ def stain_mask(image,mask, seg_params=None):
             h_image = np.uint8(255*exposure.equalize_hist(h_image))
 
             remaining_pixels = np.multiply(h_image,remainder_mask)
-            #masked_remaining_pixels = np.multiply(remaining_pixels,mask)
-            masked_remaining_pixels = remaining_pixels
+            masked_remaining_pixels = np.multiply(remaining_pixels,mask)
+            #masked_remaining_pixels = remaining_pixels
 
             # Applying manual threshold
             masked_remaining_pixels[masked_remaining_pixels<=param['threshold']] = 0
@@ -153,9 +154,20 @@ def main(args):
             )
             break
         except Exception as e:
+            print(e)
+            print('-----------------')
+            print('Retrying')
+            print('-----------------')
             # This will either be a requests.exceptions.ChunkedEncodingError or urllib3.exceptions.ProtocolError or both 
             # but not sure if this will also trigger a girder_client.HttpError
             time.sleep(1)
+
+    # Backup method for getting annotations
+    if len(annotations)==0:
+        print('Loading annotations another way')
+        histomics_annotations = dsa_handler.gc.get(f'annotation/item/{image_id}')
+        annotations = histomics_to_geojson(histomics_annotations)
+
 
     if not args.extract_sub_compartments:
 
@@ -281,7 +293,7 @@ def main(args):
             'hematoxylin_threshold': args.hematoxylin_threshold
         }
 
-    gc.put(f'/item/{args.input_image}/metadata',parameters={'metadata': job_meta})
+    gc.put(f'/item/{image_id}/metadata',parameters={'metadata': json.dumps(job_meta)})
 
 def test():
     

@@ -82,7 +82,7 @@ def main(args):
         #    ORGAN_REF_KEY[args.organ]
         #)
 
-        subprocess.call(['Rscript', '.././.cell_deconvolution.r', '"'+file_info['name']+'"','"'+ORGAN_REF_KEY[args.organ]+'"'])
+        subprocess.call(['Rscript', '../../cell_deconvolution.r', '"'+file_info['name']+'"','"'+ORGAN_REF_KEY[args.organ]+'"'])
 
         print(os.listdir(os.getcwd()+'/'))
 

@@ -13,7 +13,8 @@ options(timeout=300)
 # Function for reading in different types of counts files
 read_data_formats <- function(input_file_path){
     file_extension <- file_ext(input_file_path)
-
+    print(input_file_path)
+    print(file_extension)
     if (tolower(file_extension) == "rds"){
         read_file <- readRDS(input_file_path)
     } else if (tolower(file_extension) == "h5"){
@@ -56,7 +57,7 @@ RunSTDeconvolve <- function(read_input_file){
 integrate_kpmp_atlas <- function(spatial){
     DefaultAssay(spatial) <- "SCT"
     
-    atlas_path <- "../KidneyAtlas_snCV3_20percent.h5Seurat"
+    atlas_path <- "KidneyAtlas_snCV3_20percent.h5Seurat"
     kpmp_atlas <- LoadH5Seurat(atlas_path, assays = c("counts","scale.data"),tools = TRUE,images=False)
 
     Idents(kpmp_atlas) <- kpmp_atlas@meta.data$subclass.l2
@@ -144,8 +145,10 @@ get_cell_deconvolution <- function(input_file, organ_key){
 
 
 arg_list <- commandArgs(trailingOnly=TRUE)
-input_file <- arg_list[1]
-organ_key <- arg_list[2]
-
+print(arg_list)
+input_file <- gsub('\\"','',arg_list[1])
+organ_key <- gsub('\\"','',arg_list[2])
+print(input_file)
+print(organ_key)
 get_cell_deconvolution(input_file,organ_key)
 
